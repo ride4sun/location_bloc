@@ -6,7 +6,7 @@ import 'package:location_bloc/Location_bloc.dart';
 import 'package:location_bloc_example/misc/button.dart';
 import 'package:location_bloc_example/misc/margins.dart';
 
-class LocationValueScreen extends StatelessWidget {
+class LocationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       Scaffold(body: buildLocationWidget(context));
