@@ -1,4 +1,4 @@
-terial.dart';
+import 'package:flutter/material.dart';
 import 'package:location_bloc_example/misc/margins.dart';
 
 class Button extends StatelessWidget {
