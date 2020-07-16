@@ -6,6 +6,12 @@ import 'package:location_bloc/Location_bloc.dart';
 import 'package:location_bloc_example/misc/button.dart';
 import 'package:location_bloc_example/misc/margins.dart';
 
+class Value {
+  Value({this.description, this.unit});
+  final String description;
+  final String unit;
+}
+
 class LocationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
@@ -19,7 +25,7 @@ class LocationScreen extends StatelessWidget {
           children: <Widget>[
             Center(
               child: Margins(
-                all: 20,
+                all: 40,
                 child: _buildButton(
                   context,
                   BlocProvider.of(context),
@@ -27,7 +33,7 @@ class LocationScreen extends StatelessWidget {
               ),
             ),
             Expanded(
-                child: _buildPositionDataDisplay(
+                child: _buildLocationValueDisplay(
                     context, BlocProvider.of(context))),
           ],
         );
@@ -64,94 +70,35 @@ class LocationScreen extends StatelessWidget {
       throw ArgumentError('Unknown State - implement!');
   }
 
-  Widget _buildPositionDataDisplay(BuildContext context, LocationBloc bloc) {
+  Widget _buildLocationValueDisplay(BuildContext context, LocationBloc bloc) {
     if (!(bloc.state is SendData))
       return Container();
     else {
       var location = (bloc.state as SendData).location;
 
-      return Column(
-        children: <Widget>[
-//          UnitSelection(),
-          Margins(
-            all: 10,
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text('Longitude'),
-                Text('${location.longitude}')
-              ],
-            ),
-          ),
-          new Margins(
+      var valueWidgets = [
+        Value(description: 'Longitude', unit: location.longitude.toString()),
+        Value(description: 'Latitude', unit: location.latitude.toString()),
+        Value(description: 'Accuracy', unit: location.accuracy.toString()),
+        Value(description: 'Altitude', unit: location.altitude.toString()),
+        Value(description: 'Speed', unit: location.speed.toString()),
+        Value(
+            description: 'Speed Accuracy',
+            unit: location.speedAccuracy.toString()),
+        Value(description: 'Date Time', unit: location.dateTime.toString()),
+      ]
+          .map(
+            (e) => Margins(
               all: 10,
               child: new Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text('Latitude'),
-                  Text('${location.latitude}')
-                ],
-              )),
-          new Margins(
-            all: 10,
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text('accuracy'),
-                Text('${location.accuracy}')
-              ],
+                children: <Widget>[Text(e.description), Text(e.unit)],
+              ),
             ),
-          ),
-          new Margins(
-            all: 10,
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text('altitude'),
-                Text('${location.altitude}')
-              ],
-            ),
-          ),
-          new Margins(
-            all: 10,
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[Text('Speed'), Text('${location.speed}')],
-            ),
-          ),
-          new Margins(
-            all: 10,
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text('Speed Accuracy'),
-                Text('${location.speedAccuracy}')
-              ],
-            ),
-          ),
-          new Margins(
-              all: 10,
-              child: new Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text('Heading'),
-                  Text('${location.heading}')
-                ],
-              )),
-          new Margins(
-            all: 10,
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text('Time'),
-                Text(
-                  '${location.dateTime}',
-                )
-              ],
-            ),
-          ),
-        ],
-      );
+          )
+          .toList();
+
+      return Column(children: valueWidgets);
     }
   }
 }

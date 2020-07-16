@@ -66,21 +66,19 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       }
     }
 
-//    await ploc.Location()
-//        .changeSettings(accuracy: ploc.LocationAccuracy.high, interval: 1);
+    await ploc.Location()
+        .changeSettings(accuracy: ploc.LocationAccuracy.high, interval: 1);
 
-    _locationSubscription = location.onLocationChanged.listen(
-      (location) async* {
-        if (location.isNotNull) {
-          yield LocationState.sendData(location: updateLocation(location));
-        }
-      },
-    );
+    await for (LocationData location in location.onLocationChanged) {
+      if (location.isNotNull) {
+        yield LocationState.sendData(location: updateLocation(location));
+      }
+    }
 
-    _locationSubscription.onError((err) async* {
-      yield _handleError(err);
-      _locationSubscription.cancel();
-    });
+//    _locationSubscription.onError((err) async* {
+//      yield _handleError(err);
+//      _locationSubscription.cancel();
+//    });
 
     //send one initial update to change state
     yield LocationState.sendData(
