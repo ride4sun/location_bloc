@@ -28,13 +28,13 @@ class LocationScreen extends StatelessWidget {
                 all: 40,
                 child: _buildButton(
                   context,
-                  BlocProvider.of(context),
+                  BlocProvider.of<LocationBloc>(context),
                 ),
               ),
             ),
             Expanded(
                 child: _buildLocationValueDisplay(
-                    context, BlocProvider.of(context))),
+                    context, BlocProvider.of<LocationBloc>(context))),
           ],
         );
       },

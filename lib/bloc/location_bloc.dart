@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:location/location.dart' as ploc;
@@ -18,9 +19,24 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
 
   final location = ploc.Location();
   final StreamController<LocationState> stateController =
-      StreamController<LocationState>();
+      StreamController<LocationState>(onListen: () {
+    //debugger(when: true);
+  }, onPause: () {
+    //debugger(when: true);
+  }, onResume: () {
+    //debugger(when: true);
+  }, onCancel: () {
+    //debugger(when: true);
+  });
+
   StreamSubscription _locationSubscription;
   mo.UnitSystem _system = mo.UnitSystem.Metrics;
+
+  @override
+  void onError(Object error, StackTrace stackTrace) {
+    super.onError(error, stackTrace);
+    debugger(when: true);
+  }
 
   @override
   Stream<LocationState> mapEventToState(LocationEvent event) {
@@ -29,6 +45,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       start: (_) => _start(),
       stop: (_) => _stop(),
     );
+
     return stateController.stream;
   }
 
@@ -44,9 +61,8 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       );
   }
 
-  _start() async {
+  Future _start() async {
     if (_locationSubscription.isNotNull) return;
-
     ploc.PermissionStatus permission = await location.hasPermission();
     if (permission != ploc.PermissionStatus.granted) {
       permission = await location.requestPermission();
@@ -90,9 +106,10 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       },
     );
 
-    _locationSubscription.onError((err) {
-      _handleError(err);
-      _locationSubscription.cancel();
+    _locationSubscription.onError((err) async {
+      await _handleError(err);
+      await _locationSubscription.cancel();
+      _locationSubscription = null;
     });
 
     //send one initial update to change state
@@ -105,7 +122,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     );
   }
 
-  _handleError(dynamic error) {
+  Future _handleError(dynamic error) async {
     if (error.code == 'PERMISSION_DENIED') {
       stateController.add(LocationState.error(
           info: 'Permission Denied', results: gpsError.permissionDenied));
@@ -120,7 +137,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     }
   }
 
-  _stop() async {
+  Future _stop() async {
     await _locationSubscription?.cancel();
     _locationSubscription = null;
     stateController.add(LocationState.stoped());
@@ -136,10 +153,10 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       speedAccuracy:
           mo.Length.fromMeters(value: data.speedAccuracy, system: _system));
 
-  Future dispose() async {
-    await _locationSubscription?.cancel();
-    await this.drain();
-    await this.close();
-    _locationSubscription = null;
-  }
+//  Future dispose() async {
+//    await _locationSubscription?.cancel();
+//    await this.drain();
+//    await this.close();
+//    _locationSubscription = null;
+//  }
 }

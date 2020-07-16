@@ -4,6 +4,7 @@ import 'package:location_bloc/location_bloc.dart';
 import 'package:location_bloc_example/location_screen.dart';
 
 void main() {
+  Bloc.observer = LocationBlocObserver();
   runApp(LocationBlocExampleApp());
 }
 
@@ -16,8 +17,8 @@ class LocationBlocExampleApp extends StatelessWidget {
       theme: ThemeData(
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity),
-      home: BlocProvider(
-        create: (BuildContext context) => LocationBloc(LocationState.stoped()),
+      home: BlocProvider<LocationBloc>(
+        create: (context) => LocationBloc(LocationState.stoped()),
         child: LocationScreen(),
       ),
     );
