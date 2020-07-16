@@ -8,10 +8,11 @@ import 'package:location_bloc/bloc/location_state.dart';
 import 'package:location_bloc/extensions/extensions.dart';
 import 'package:location_bloc/model/model.dart' as mo;
 
-enum gpsError {
+enum locationError {
   noError,
   permissionDenied,
   permissionDeniedNeverAsk,
+  undefined
 }
 
 class LocationBloc extends Bloc<LocationEvent, LocationState> {
@@ -71,7 +72,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         stateController.add(LocationState.error(
             info: 'Location Service has no permission. '
                 'Please check settings',
-            results: gpsError.permissionDenied));
+            results: locationError.permissionDenied));
         return;
       }
     }
@@ -85,7 +86,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
           LocationState.error(
               info: 'Location not active.'
                   'Please check your settings',
-              results: gpsError.permissionDenied),
+              results: locationError.permissionDenied),
         );
         return;
       }
@@ -107,9 +108,9 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     );
 
     _locationSubscription.onError((err) async {
-      await _handleError(err);
       await _locationSubscription.cancel();
       _locationSubscription = null;
+      await _handleError(err);
     });
 
     //send one initial update to change state
@@ -125,15 +126,14 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   Future _handleError(dynamic error) async {
     if (error.code == 'PERMISSION_DENIED') {
       stateController.add(LocationState.error(
-          info: 'Permission Denied', results: gpsError.permissionDenied));
+          info: 'Permission Denied', results: locationError.permissionDenied));
     } else if (error.code == 'PERMISSION_DENIED_NEVER_ASK') {
       stateController.add(LocationState.error(
           info: 'Permission Denied',
-          results: gpsError.permissionDeniedNeverAsk));
+          results: locationError.permissionDeniedNeverAsk));
     } else {
       stateController.add(LocationState.error(
-          info: 'Could not get Location ',
-          results: gpsError.permissionDeniedNeverAsk));
+          info: 'Could not get Location ', results: locationError.undefined));
     }
   }
 
