@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:location/location.dart' as ploc;
-import 'package:location/location.dart';
 import 'package:location_bloc/bloc/location_event.dart';
 import 'package:location_bloc/bloc/location_state.dart';
 import 'package:location_bloc/extensions/extensions.dart';
@@ -18,37 +17,45 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   LocationBloc(LocationState initialState) : super(initialState);
 
   final location = ploc.Location();
+  final StreamController<LocationState> stateController =
+      StreamController<LocationState>();
+  StreamSubscription _locationSubscription;
+  mo.UnitSystem _system = mo.UnitSystem.Metrics;
 
   @override
-  Stream<LocationState> mapEventToState(LocationEvent event) async* {
-    yield* event.when(
+  Stream<LocationState> mapEventToState(LocationEvent event) {
+    event.when(
       setUnitSystem: (args) => _setUnitSystem(args),
       start: (_) => _start(),
       stop: (_) => _stop(),
     );
+    return stateController.stream;
   }
 
-  Stream<LocationState> _setUnitSystem(SetUnitSystem args) async* {
+  _setUnitSystem(SetUnitSystem args) async {
     _system = args.unitSystem;
     if (state is SendData)
-      yield LocationState.sendData(
-          location: updateLocation(await location.getLocation()));
-    else
-      yield state;
+      stateController.add(
+        LocationState.sendData(
+          location: updateLocation(
+            await location.getLocation(),
+          ),
+        ),
+      );
   }
 
-  Stream<LocationState> _start() async* {
+  _start() async {
     if (_locationSubscription.isNotNull) return;
 
-    PermissionStatus permission = await location.hasPermission();
-    if (permission != PermissionStatus.granted) {
+    ploc.PermissionStatus permission = await location.hasPermission();
+    if (permission != ploc.PermissionStatus.granted) {
       permission = await location.requestPermission();
 
-      if (permission != PermissionStatus.granted) {
-        yield LocationState.error(
+      if (permission != ploc.PermissionStatus.granted) {
+        stateController.add(LocationState.error(
             info: 'Location Service has no permission. '
                 'Please check settings',
-            results: gpsError.permissionDenied);
+            results: gpsError.permissionDenied));
         return;
       }
     }
@@ -58,10 +65,12 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     if (enabled.isFalse) {
       bool enabled = await location.requestService();
       if (enabled.isFalse) {
-        yield LocationState.error(
-            info: 'Location not active.'
-                'Please check your settings',
-            results: gpsError.permissionDenied);
+        stateController.add(
+          LocationState.error(
+              info: 'Location not active.'
+                  'Please check your settings',
+              results: gpsError.permissionDenied),
+        );
         return;
       }
     }
@@ -69,41 +78,52 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     await ploc.Location()
         .changeSettings(accuracy: ploc.LocationAccuracy.high, interval: 1);
 
-    await for (LocationData location in location.onLocationChanged) {
-      if (location.isNotNull) {
-        yield LocationState.sendData(location: updateLocation(location));
-      }
-    }
+    _locationSubscription = location.onLocationChanged.listen(
+      (data) {
+        if (location.isNotNull) {
+          stateController.add(
+            LocationState.sendData(
+              location: updateLocation(data),
+            ),
+          );
+        }
+      },
+    );
 
-//    _locationSubscription.onError((err) async* {
-//      yield _handleError(err);
-//      _locationSubscription.cancel();
-//    });
+    _locationSubscription.onError((err) {
+      _handleError(err);
+      _locationSubscription.cancel();
+    });
 
     //send one initial update to change state
-    yield LocationState.sendData(
-        location: updateLocation(await ploc.Location().getLocation()));
+    stateController.add(
+      LocationState.sendData(
+        location: updateLocation(
+          await ploc.Location().getLocation(),
+        ),
+      ),
+    );
   }
 
-  Stream<LocationState> _handleError(dynamic error) async* {
+  _handleError(dynamic error) {
     if (error.code == 'PERMISSION_DENIED') {
-      yield LocationState.error(
-          info: 'Permission Denied', results: gpsError.permissionDenied);
+      stateController.add(LocationState.error(
+          info: 'Permission Denied', results: gpsError.permissionDenied));
     } else if (error.code == 'PERMISSION_DENIED_NEVER_ASK') {
-      yield LocationState.error(
+      stateController.add(LocationState.error(
           info: 'Permission Denied',
-          results: gpsError.permissionDeniedNeverAsk);
+          results: gpsError.permissionDeniedNeverAsk));
     } else {
-      yield LocationState.error(
+      stateController.add(LocationState.error(
           info: 'Could not get Location ',
-          results: gpsError.permissionDeniedNeverAsk);
+          results: gpsError.permissionDeniedNeverAsk));
     }
   }
 
-  Stream<LocationState> _stop() async* {
+  _stop() async {
     await _locationSubscription?.cancel();
     _locationSubscription = null;
-    yield LocationState.stoped();
+    stateController.add(LocationState.stoped());
   }
 
   mo.Location updateLocation(ploc.LocationData data) => mo.Location(
@@ -122,7 +142,4 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     await this.close();
     _locationSubscription = null;
   }
-
-  StreamSubscription _locationSubscription;
-  mo.UnitSystem _system = mo.UnitSystem.Metrics;
 }
