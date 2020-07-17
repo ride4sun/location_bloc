@@ -22,10 +22,10 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   @override
   Stream<LocationState> mapEventToState(LocationEvent event) async* {
     yield* event.when(
-      setUnitSystem: (args) => _setUnitSystem(args),
-      start: (_) => _start(),
-      stop: (_) => _stop(),
-    );
+        setUnitSystem: (args) => _setUnitSystem(args),
+        start: (_) => _start(),
+        stop: (_) => _stop(),
+        updateData: (args) => _updateData(args));
   }
 
   Stream<LocationState> _setUnitSystem(SetUnitSystem args) async* {
@@ -35,6 +35,10 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
           location: updateLocation(await location.getLocation()));
     else
       yield state;
+  }
+
+  Stream<LocationState> _updateData(UpdateData args) async* {
+    yield LocationState.sendData(location: updateLocation(args.location));
   }
 
   Stream<LocationState> _start() async* {
@@ -66,13 +70,13 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       }
     }
 
-//    await ploc.Location()
-//        .changeSettings(accuracy: ploc.LocationAccuracy.high, interval: 1);
+    await ploc.Location()
+        .changeSettings(accuracy: ploc.LocationAccuracy.high, interval: 1);
 
     _locationSubscription = location.onLocationChanged.listen(
-      (location) async* {
-        if (location.isNotNull) {
-          yield LocationState.sendData(location: updateLocation(location));
+      (data) {
+        if (data.isNotNull) {
+          this.add(LocationEvent.updateData(location: data));
         }
       },
     );

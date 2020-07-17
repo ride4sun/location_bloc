@@ -6,6 +6,11 @@ part 'location_event.g.dart';
 enum _LocationEvent {
   @generic
   @Data(fields: [
+    DataField<Generic>('location'),
+  ])
+  UpdateData,
+  @generic
+  @Data(fields: [
     DataField<Generic>('unitSystem'),
   ])
   SetUnitSystem,
