@@ -4,6 +4,7 @@ import 'package:location_bloc/location_bloc.dart';
 import 'package:location_bloc_example/location_screen.dart';
 
 void main() {
+  Bloc.observer = LocationBlocObserver();
   runApp(LocationBlocExampleApp());
 }
 
