@@ -1,18 +1,19 @@
 import 'package:equatable/equatable.dart';
 import 'package:location_bloc/model/units/altitude.dart';
+import 'package:location_bloc/model/units/degree.dart';
 import 'package:location_bloc/model/units/length.dart';
 import 'package:location_bloc/model/units/speed.dart';
 import 'package:location_bloc/model/units/unit_system.dart';
 import 'package:meta/meta.dart';
 
 class Location extends Equatable {
-  final double latitude;
-  final double longitude;
+  final Degree latitude;
+  final Degree longitude;
   final Length accuracy;
   final Altitude altitude;
   final Speed speed;
   final Length speedAccuracy;
-  final double heading;
+  final Degree heading;
   final String dateTime;
   final UnitSystem measurementSystem;
 
@@ -57,8 +58,10 @@ class Location extends Equatable {
       UnitSystem system = UnitSystem.Metrics}) {
     return Location._internal(
       measurementSystem: system,
-      latitude: double.parse(dataMap['latitude'] ?? 0),
-      longitude: double.parse(dataMap['longitude'] ?? 0),
+      latitude: Degree.fromNumber(
+          degree: (double.parse(dataMap['latitude'] ?? 0.0)), precision: 4),
+      longitude: Degree.fromNumber(
+          degree: (double.parse(dataMap['longitude'] ?? 0.0)), precision: 4),
       accuracy:
           Length.fromMeters(value: double.parse(dataMap['accuracy'] ?? 0)),
       altitude:
@@ -67,7 +70,8 @@ class Location extends Equatable {
           Speed.fromMeterPerSecond(value: double.parse(dataMap['speed'] ?? 0)),
       speedAccuracy:
           Length.fromMeters(value: double.parse(dataMap['speedAccuracy'] ?? 0)),
-      heading: double.parse(dataMap['heading'] ?? 0),
+      heading: Degree.fromNumber(
+          degree: (double.parse(dataMap['heading'] ?? 0.0)), precision: 2),
       dateTime: dataMap['dateTime'] ?? DateTime.now().toIso8601String(),
     );
   }

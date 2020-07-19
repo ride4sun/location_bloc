@@ -1,21 +1,23 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:location_bloc/model/units/unit.dart';
 
 class Degree extends Unit implements Equatable {
-  final double _degree;
+  final double degree;
+  final int precision;
 
   @override
   String get unit => '°';
 
   @override
-  String get value => _degree.toStringAsFixed(1);
+  String get value => degree.toStringAsFixed(precision);
 
-  Degree.fromNumber({double value: 0.0}) : _degree = value;
+  Degree.fromNumber({@required this.degree, this.precision = 1});
 
-  int compareTo(Degree other) => _degree.compareTo(other._degree);
+  int compareTo(Degree other) => degree.compareTo(other.degree);
 
   @override
-  List<Object> get props => [value];
+  List<Object> get props => [degree];
 
   @override
   bool get stringify => true;

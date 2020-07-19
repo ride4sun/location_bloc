@@ -10,7 +10,7 @@ part of 'location_event.dart';
 abstract class LocationEvent<T> extends Equatable {
   const LocationEvent(this._type);
 
-  factory LocationEvent.updateData({@required T location}) = UpdateData<T>;
+  factory LocationEvent.updateData({@required T location}) = _UpdateData<T>;
 
   factory LocationEvent.setUnitSystem({@required T unitSystem}) =
       SetUnitSystem<T>;
@@ -23,7 +23,7 @@ abstract class LocationEvent<T> extends Equatable {
 
 //ignore: missing_return
   R when<R>(
-      {@required R Function(UpdateData<T>) updateData,
+      {@required R Function(_UpdateData<T>) updateData,
       @required R Function(SetUnitSystem<T>) setUnitSystem,
       @required R Function(Start<T>) start,
       @required R Function(Stop<T>) stop}) {
@@ -37,8 +37,8 @@ abstract class LocationEvent<T> extends Equatable {
       return true;
     }());
     switch (this._type) {
-      case _LocationEvent.UpdateData:
-        return updateData(this as UpdateData);
+      case _LocationEvent._UpdateData:
+        return updateData(this as _UpdateData);
       case _LocationEvent.SetUnitSystem:
         return setUnitSystem(this as SetUnitSystem);
       case _LocationEvent.Start:
@@ -50,7 +50,7 @@ abstract class LocationEvent<T> extends Equatable {
 
 //ignore: missing_return
   Future<R> asyncWhen<R>(
-      {@required FutureOr<R> Function(UpdateData<T>) updateData,
+      {@required FutureOr<R> Function(_UpdateData<T>) updateData,
       @required FutureOr<R> Function(SetUnitSystem<T>) setUnitSystem,
       @required FutureOr<R> Function(Start<T>) start,
       @required FutureOr<R> Function(Stop<T>) stop}) {
@@ -64,8 +64,8 @@ abstract class LocationEvent<T> extends Equatable {
       return true;
     }());
     switch (this._type) {
-      case _LocationEvent.UpdateData:
-        return updateData(this as UpdateData);
+      case _LocationEvent._UpdateData:
+        return updateData(this as _UpdateData);
       case _LocationEvent.SetUnitSystem:
         return setUnitSystem(this as SetUnitSystem);
       case _LocationEvent.Start:
@@ -76,7 +76,7 @@ abstract class LocationEvent<T> extends Equatable {
   }
 
   R whenOrElse<R>(
-      {R Function(UpdateData<T>) updateData,
+      {R Function(_UpdateData<T>) updateData,
       R Function(SetUnitSystem<T>) setUnitSystem,
       R Function(Start<T>) start,
       R Function(Stop<T>) stop,
@@ -88,9 +88,9 @@ abstract class LocationEvent<T> extends Equatable {
       return true;
     }());
     switch (this._type) {
-      case _LocationEvent.UpdateData:
+      case _LocationEvent._UpdateData:
         if (updateData == null) break;
-        return updateData(this as UpdateData);
+        return updateData(this as _UpdateData);
       case _LocationEvent.SetUnitSystem:
         if (setUnitSystem == null) break;
         return setUnitSystem(this as SetUnitSystem);
@@ -105,7 +105,7 @@ abstract class LocationEvent<T> extends Equatable {
   }
 
   Future<R> asyncWhenOrElse<R>(
-      {FutureOr<R> Function(UpdateData<T>) updateData,
+      {FutureOr<R> Function(_UpdateData<T>) updateData,
       FutureOr<R> Function(SetUnitSystem<T>) setUnitSystem,
       FutureOr<R> Function(Start<T>) start,
       FutureOr<R> Function(Stop<T>) stop,
@@ -117,9 +117,9 @@ abstract class LocationEvent<T> extends Equatable {
       return true;
     }());
     switch (this._type) {
-      case _LocationEvent.UpdateData:
+      case _LocationEvent._UpdateData:
         if (updateData == null) break;
-        return updateData(this as UpdateData);
+        return updateData(this as _UpdateData);
       case _LocationEvent.SetUnitSystem:
         if (setUnitSystem == null) break;
         return setUnitSystem(this as SetUnitSystem);
@@ -135,7 +135,7 @@ abstract class LocationEvent<T> extends Equatable {
 
 //ignore: missing_return
   Future<void> whenPartial(
-      {FutureOr<void> Function(UpdateData<T>) updateData,
+      {FutureOr<void> Function(_UpdateData<T>) updateData,
       FutureOr<void> Function(SetUnitSystem<T>) setUnitSystem,
       FutureOr<void> Function(Start<T>) start,
       FutureOr<void> Function(Stop<T>) stop}) {
@@ -149,9 +149,9 @@ abstract class LocationEvent<T> extends Equatable {
       return true;
     }());
     switch (this._type) {
-      case _LocationEvent.UpdateData:
+      case _LocationEvent._UpdateData:
         if (updateData == null) break;
-        return updateData(this as UpdateData);
+        return updateData(this as _UpdateData);
       case _LocationEvent.SetUnitSystem:
         if (setUnitSystem == null) break;
         return setUnitSystem(this as SetUnitSystem);
@@ -169,14 +169,14 @@ abstract class LocationEvent<T> extends Equatable {
 }
 
 @immutable
-class UpdateData<T> extends LocationEvent<T> {
-  const UpdateData({@required this.location})
-      : super(_LocationEvent.UpdateData);
+class _UpdateData<T> extends LocationEvent<T> {
+  const _UpdateData({@required this.location})
+      : super(_LocationEvent._UpdateData);
 
   final T location;
 
   @override
-  String toString() => 'UpdateData(location:${this.location})';
+  String toString() => '_UpdateData(location:${this.location})';
   @override
   List get props => [location];
 }

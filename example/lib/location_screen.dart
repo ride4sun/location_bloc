@@ -26,9 +26,12 @@ class LocationScreen extends StatelessWidget {
             Center(
               child: Margins(
                 all: 20,
-                child: _buildButton(
-                  context,
-                  BlocProvider.of(context),
+                child: Margins(
+                  all: 20,
+                  child: _buildButton(
+                    context,
+                    BlocProvider.of(context),
+                  ),
                 ),
               ),
             ),

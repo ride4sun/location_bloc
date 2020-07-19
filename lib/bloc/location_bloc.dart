@@ -37,7 +37,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       yield state;
   }
 
-  Stream<LocationState> _updateData(UpdateData args) async* {
+  Stream<LocationState> _updateData(_UpdateData args) async* {
     yield LocationState.sendData(location: updateLocation(args.location));
   }
 
@@ -116,9 +116,9 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       altitude: mo.Altitude.fromMeters(value: data.altitude, system: _system),
       speed: mo.Speed.fromMeterPerSecond(value: data.speed, system: _system),
       accuracy: mo.Length.fromMeters(value: data.accuracy, system: _system),
-      heading: data.heading,
-      latitude: data.latitude,
-      longitude: data.longitude,
+      heading: mo.Degree.fromNumber(degree: data.heading, precision: 2),
+      latitude: mo.Degree.fromNumber(degree: data.latitude, precision: 5),
+      longitude: mo.Degree.fromNumber(degree: data.longitude, precision: 5),
       speedAccuracy:
           mo.Length.fromMeters(value: data.speedAccuracy, system: _system));
 

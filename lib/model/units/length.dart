@@ -63,9 +63,6 @@ class Length extends Unit implements Equatable {
         : inMiles.toStringAsFixed(fractionDigitsSAE);
   }
 
-  @override
-  String toString() => '$value $unit';
-
   double get inMeters => _returnValueOrZero(_length);
   double get inKilometers => _returnValueOrZero(_length * _m_to_km);
   double get inMiles => _returnValueOrZero(_length * _m_to_mi);
