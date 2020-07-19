@@ -8,7 +8,7 @@ enum _LocationEvent {
   @Data(fields: [
     DataField<Generic>('location'),
   ])
-  _UpdateData,
+  UpdateData,
   @generic
   @Data(fields: [
     DataField<Generic>('unitSystem'),

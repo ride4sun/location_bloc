@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:location_bloc/Location_bloc.dart';
+import 'package:location_bloc/location_bloc.dart';
 import 'package:location_bloc_example/misc/button.dart';
 import 'package:location_bloc_example/misc/margins.dart';
 
@@ -48,14 +48,12 @@ class LocationScreen extends StatelessWidget {
     if (bloc.state is Stoped)
       return Margins(
         top: 30,
-        child:
-            Button(text: 'Start', onTap: () => bloc.add(LocationEvent.start())),
+        child: Button(text: 'Start', onTap: () => bloc.start()),
       );
     else if (bloc.state is SendData)
       return Margins(
         top: 30,
-        child:
-            Button(text: 'Stop', onTap: () => bloc.add(LocationEvent.stop())),
+        child: Button(text: 'Stop', onTap: () => bloc.stop()),
       );
     else if (bloc.state is Error) {
       return Column(
@@ -65,7 +63,7 @@ class LocationScreen extends StatelessWidget {
             Margins(
               top: 30,
               child: Button(
-                  text: 'Start', onTap: () => bloc.add(LocationEvent.start())),
+                  text: 'Start', onTap: () => bloc.start()),
             ),
             Text('${bloc.state}')
           ]);

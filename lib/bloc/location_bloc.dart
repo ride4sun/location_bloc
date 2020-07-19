@@ -18,6 +18,16 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   LocationBloc(LocationState initialState) : super(initialState);
 
   final location = ploc.Location();
+  Stream<LocationState> _updateData(UpdateData args) async* {
+    yield LocationState.sendData(location: updateLocation(args.location));
+  }
+
+  void start() => this.add(LocationEvent.start());
+
+  void stop() => this.add(LocationEvent.stop());
+
+  set(mo.UnitSystem system) =>
+      this.add(LocationEvent.setUnitSystem(unitSystem: system));
 
   @override
   Stream<LocationState> mapEventToState(LocationEvent event) async* {
@@ -35,10 +45,6 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
           location: updateLocation(await location.getLocation()));
     else
       yield state;
-  }
-
-  Stream<LocationState> _updateData(_UpdateData args) async* {
-    yield LocationState.sendData(location: updateLocation(args.location));
   }
 
   Stream<LocationState> _start() async* {
